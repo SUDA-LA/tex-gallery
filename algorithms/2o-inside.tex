@@ -1,0 +1,62 @@
+\documentclass{letter}
+\usepackage{times}
+\usepackage{amssymb}
+\usepackage{algorithm, algorithmic, letltxmacro}
+
+\thispagestyle{empty}
+
+\date{\today}
+
+\begin{document}
+\begin{algorithm}[tb]
+\begin{algorithmic}[1]
+% \renewcommand{\algorithmiccomment}[2][.6\linewidth]{\leavevmode\hfill\makebox[#1][l]{/~#2}}
+% \renewcommand{\COMMENT}[2][.4\linewidth]{\leavevmode\hfill\makebox[#1][l]{$\rhd$~#2}}
+\newlength{\commentindent}
+\setlength{\commentindent}{.2\textwidth}
+\renewcommand{\algorithmiccomment}[1]{\unskip\hfill\makebox[\commentindent][l]{$\rhd$~#1}\par}
+\LetLtxMacro{\oldalgorithmic}{\algorithmic}
+\renewcommand{\algorithmic}[1][0]{%
+  \oldalgorithmic[#1]%
+  \renewcommand{\ALC@com}[1]{%
+  \ifnum\pdfstrcmp{##1}{default}=0\else\algorithmiccomment{##1}\fi}%
+}
+\begin{footnotesize}
+\STATE \textbf{define:} $I,S,C \in \mathbb{R}^{n \times n \times B}$ \COMMENT{B is batch size}
+\STATE \textbf{initialize:} $C_{i, i} = \log e^0 = 0, 0 \le i \le n$
+% \STATE \hspace{\algorithmicindent}
+% \STATE \textbf{Output:} $ C_{0, n} = \log Z(\boldsymbol{x})$
+%   \COMMENT{balabala}
+
+\FOR [span width]{$w = 1$ \TO $n$}
+%\STATE \textbf{for} $w = 1$ \TO $n$ \COMMENT{span width}
+  \STATE \textbf{Batchify:} $0 \le i$; $j=i+w \le n$ (also for $B$)
+  \STATE
+    $I_{i, j} = \log\left(
+      \begin{array}{l}
+        e^{C_{i, i}  +  C_{j, i+1}} ~ + \\
+      \sum\limits_{i < r < j} e^{I_{i, r} + S_{r, j}
+      + s(i, r, j)} \\
+
+      \end{array}
+      \right)$ + s(i, j)
+
+  % \STATE $\begin{array}{l}
+  %     I_{i, j} = s(i, j) + \\ \log\left(
+  %     e^{C_{i, i}  +  C_{j, i+1}} +
+  %     \sum\limits_{i < r < j} e^{I_{i, r} + S_{r, j}
+  %       + s(i, r, j)} \right)
+  %   \end{array}$
+ % \COMMENT{refer to Figure \ref{sub@fig:eisner-2o-a}}
+
+  \STATE $S_{i, j} = \log \sum\limits_{i \le r < j} e^{C_{i, r}  +  C_{j, r+1}} $ \\
+  \STATE $C_{i, j} = \log
+    \sum\limits_{i < r \le j} e^{I_{i, r}  +  C_{r, j}}  $ \\
+\ENDFOR
+\RETURN $C_{0, n} \equiv \log Z$
+\end{footnotesize}
+\end{algorithmic}
+\caption{Second-order Inside Algorithm.}
+\label{alg:eisner-2o}
+\end{algorithm}
+\end{document}
